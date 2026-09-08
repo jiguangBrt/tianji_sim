@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<robot name="marvin_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!--
+    Supported base_model values: legacy (default), new
+    Supported arm_model values:
+      m6_696 (default), m3_615, m6s_lite_615, m6s_lite_680, m6s_lite_750,
+      m6s_lite_809
+
+    The left and right arms are always selected as a matched pair.  Every pair
+    uses the same link/joint interface.  The two bases and five arm pairs form
+    a 10-configuration matrix.
+  -->
+  <xacro:arg name="base_model" default="legacy"/>
+  <xacro:arg name="arm_model" default="m6_696"/>
+  <xacro:property name="selected_base_model" value="$(arg base_model)"/>
+  <xacro:property name="selected_arm_model" value="$(arg arm_model)"/>
+
+  <xacro:include filename="$(find marvin_description)/urdf/M6-S-L-CCS-696-V4.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/M6-S-R-CCS-696-V4.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m3_615_left.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m3_615_right.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_615_left.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_615_right.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_680_left.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_680_right.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_750_left.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_750_right.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_809_left.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/arms/m6s_lite_809_right.urdf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/stand_v3.urf.xacro"/>
+  <xacro:include filename="$(find marvin_description)/urdf/stand_new.urdf.xacro"/>
+
+  <xacro:if value="${selected_arm_model == 'm6_696'}">
+    <xacro:M6-S-L-CCS-696-V4/>
+    <xacro:M6-S-R-CCS-696-V4/>
+  </xacro:if>
+  <xacro:if value="${selected_arm_model == 'm3_615'}">
+    <xacro:marvin_m3_615_left/>
+    <xacro:marvin_m3_615_right/>
+  </xacro:if>
+  <xacro:if value="${selected_arm_model == 'm6s_lite_615'}">
+    <xacro:marvin_m6s_lite_615_left/>
+    <xacro:marvin_m6s_lite_615_right/>
+  </xacro:if>
+  <xacro:if value="${selected_arm_model == 'm6s_lite_680'}">
+    <xacro:marvin_m6s_lite_680_left/>
+    <xacro:marvin_m6s_lite_680_right/>
+  </xacro:if>
+  <xacro:if value="${selected_arm_model == 'm6s_lite_750'}">
+    <xacro:marvin_m6s_lite_750_left/>
+    <xacro:marvin_m6s_lite_750_right/>
+  </xacro:if>
+  <xacro:if value="${selected_arm_model == 'm6s_lite_809'}">
+    <xacro:marvin_m6s_lite_809_left/>
+    <xacro:marvin_m6s_lite_809_right/>
+  </xacro:if>
+
+  <xacro:if value="${selected_base_model == 'legacy'}">
+    <xacro:stand/>
+
+    <joint name="base_to_left_arm" type="fixed">
+      <parent link="base_link"/>
+      <child link="Base_L"/>
+      <origin xyz="0 0.026 1.121" rpy="-1.57 0 0"/>
+    </joint>
+
+    <joint name="base_to_right_arm" type="fixed">
+      <parent link="base_link"/>
+      <child link="Base_R"/>
+      <origin xyz="0 -0.026 1.121" rpy="1.57 0 0"/>
+    </joint>
+  </xacro:if>
+
+  <xacro:if value="${selected_base_model == 'new'}">
+    <xacro:new_stand/>
+
+    <joint name="base_to_left_arm" type="fixed">
+      <parent link="base_link"/>
+      <child link="Base_L"/>
+      <origin xyz="0 0.026 1.121" rpy="-1.5700001 0 0"/>
+    </joint>
+
+    <joint name="base_to_right_arm" type="fixed">
+      <parent link="base_link"/>
+      <child link="Base_R"/>
+      <origin xyz="0 -0.026 1.121" rpy="1.5700001 0 0"/>
+    </joint>
+  </xacro:if>
+
+  <link name="left_tool"/>
+  <joint name="left_tool_joint" type="fixed">
+    <parent link="flange_L"/>
+    <child link="left_tool"/>
+    <origin xyz="0 0 .145" rpy="3.14 -1.57 0"/>
+  </joint>
+
+  <link name="right_tool"/>
+  <joint name="right_tool_joint" type="fixed">
+    <parent link="flange_R"/>
+    <child link="right_tool"/>
+    <origin xyz="0 0 .145" rpy="-3.14 -1.57 0"/>
+  </joint>
+</robot>

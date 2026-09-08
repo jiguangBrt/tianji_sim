@@ -1,0 +1,17 @@
+[project]
+name = "tianji-sim"
+version = "0.1.0"
+description = "MuJoCo simulation assets and environments for the TianJi Marvin Pro dual-arm robot"
+requires-python = ">=3.10"
+dependencies = [
+    "mujoco>=3.2",
+    "numpy>=1.23",
+    "pillow>=9.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = false

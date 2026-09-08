@@ -1,0 +1,90 @@
+captured_from: nvidia@6.6.7.100
+hostname: vision
+robot:
+  platform: pro
+  model: new_m6_696
+  controller_ip: 6.6.7.190
+  ros_namespace: tj
+  active_xacro: /opt/kernelmind/apex/install/marvin_description/share/marvin_description/urdf/marvin_CCS_matrix.urdf.xacro
+  expanded_urdf: ../active_robot_description.urdf
+  packaged_expanded_urdf: pro_m6_696_new.urdf
+  topology:
+    links: 22
+    joints: 21
+    revolute_joints: 14
+    cameras_in_active_urdf: 0
+    gripper_geometry_in_active_urdf: false
+  control_rate_hz: 200
+  joint_state_rate_hz: 100
+  qp_rate_hz: 500
+
+fixed_transforms:
+  - {parent: base_link, child: tracking_base_link, xyz_m: [0.0, 0.0, -0.1], rpy_rad: [0.0, 0.0, 0.0]}
+  - {parent: base_link, child: Base_L, xyz_m: [0.0, 0.026, 1.121], rpy_rad: [-1.5700001, 0.0, 0.0]}
+  - {parent: base_link, child: Base_R, xyz_m: [0.0, -0.026, 1.121], rpy_rad: [1.5700001, 0.0, 0.0]}
+  - {parent: Link7_L, child: flange_L, xyz_m: [0.0, -0.088, 0.0], rpy_rad: [1.5708, -1.5708, 0.0]}
+  - {parent: Link7_R, child: flange_R, xyz_m: [0.0, -0.088, 0.0], rpy_rad: [1.5708, -1.5708, 0.0]}
+  - {parent: flange_L, child: left_tool, xyz_m: [0.0, 0.0, 0.145], rpy_rad: [3.14, -1.57, 0.0]}
+  - {parent: flange_R, child: right_tool, xyz_m: [0.0, 0.0, 0.145], rpy_rad: [-3.14, -1.57, 0.0]}
+
+joint_order:
+  - Joint1_L
+  - Joint2_L
+  - Joint3_L
+  - Joint4_L
+  - Joint5_L
+  - Joint6_L
+  - Joint7_L
+  - Joint1_R
+  - Joint2_R
+  - Joint3_R
+  - Joint4_R
+  - Joint5_R
+  - Joint6_R
+  - Joint7_R
+
+urdf_joint_limits_each_arm:
+  Joint1: {lower_rad: -3.1067, upper_rad: 3.1067, velocity_rad_s: 3.1416, effort: 108.0}
+  Joint2: {lower_rad: -2.0944, upper_rad: 2.0944, velocity_rad_s: 3.1416, effort: 108.0}
+  Joint3: {lower_rad: -3.1067, upper_rad: 3.1067, velocity_rad_s: 3.1416, effort: 66.0}
+  Joint4: {lower_rad: -2.5307, upper_rad: 1.0472, velocity_rad_s: 3.1416, effort: 66.0}
+  Joint5: {lower_rad: -3.1067, upper_rad: 3.1067, velocity_rad_s: 3.1416, effort: 18.0}
+  Joint6: {lower_rad: -1.0472, upper_rad: 1.0472, velocity_rad_s: 3.1416, effort: 18.0}
+  Joint7: {lower_rad: -1.5708, upper_rad: 1.5708, velocity_rad_s: 3.1416, effort: 18.0}
+
+runtime_topics:
+  measured_joints: /tj/joint_states
+  joint_feedback: /tj/info/joint_feedback
+  left_eef: /tj/info/eef_left
+  right_eef: /tj/info/eef_right
+  left_wrench: /tj/info/wrench_left
+  right_wrench: /tj/info/wrench_right
+  left_gripper_feedback: /tj/info/gripper_feedback_L
+  right_gripper_feedback: /tj/info/gripper_feedback_R
+  robot_info: /tj/info/robot_info
+  dynamic_tf: /tf
+  static_tf: /tf_static
+
+gripper:
+  active_node: /tj/dm_gripper_motor_node
+  hardware: DM4310
+  motor_ids: {left: 1, right: 2}
+  runtime_motor_position_range: [0.0, 1.6]
+  command_normalized_range: [0.0, 1.0]
+  feedback_array_fields: [position, velocity, torque, mos_temperature, motor_temperature]
+  dataset_normalization_reference: {open: 0.0, closed: 1.25}
+  warning: >-
+    The motor-position range and dataset normalization are different conventions.
+    A measured motor-position-to-finger-separation calibration is not available.
+
+simulation_notes:
+  qp_velocity_limits_note: >-
+    Raw QP controller configuration is included under control/. Its configured
+    velocities differ from the URDF limits (notably Joint3 and Joint5), so keep
+    both sources and choose limits deliberately for a simulator.
+  force_frames: [flange_L, flange_R]
+  eef_pose_frame: base_link
+  missing_from_active_model:
+    - four_camera_links_and_extrinsics
+    - gripper_collision_visual_inertial_model
+    - motor_position_to_jaw_geometry_mapping

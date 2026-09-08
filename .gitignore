@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+renders/
+libero_videos/
+# Heavy third-party gripper CAD (re-fetch: github.com/YlsonDdb/DM_Gripper, cad_resources/)
+assets/gripper_cad/
