@@ -48,7 +48,7 @@ def main() -> None:
     if drift > 0.05:
         print("WARN: joints drifted more than 0.05 rad/m from home")
 
-    for name in ("flange_L", "flange_R", "left_tool", "right_tool"):
+    for name in ("flange_L", "flange_R", "left_tool", "right_tool", "cone_1", "cone_2"):
         bid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
         print(f"{name} world pos: {np.round(data.xpos[bid], 3)}")
 

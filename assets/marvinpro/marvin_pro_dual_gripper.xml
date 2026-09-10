@@ -41,6 +41,7 @@
     <mesh name="Link6_R" content_type="model/stl" file="meshes/link6_r.stl"/>
     <mesh name="Link7_R" content_type="model/stl" file="meshes/link7_r.stl"/>
     <mesh name="ZJ_Robot_link" content_type="model/stl" file="meshes/zj_robot_link.stl"/>
+    <mesh name="claw_plate" vertex="-0.0150 -0.0040 0.0100 0.0150 -0.0040 0.0100 0.0150 -0.0040 0.0350 0.0000 -0.0040 0.0800 -0.0150 -0.0040 0.0350 -0.0150 0.0000 0.0100 0.0150 0.0000 0.0100 0.0150 0.0000 0.0350 0.0000 0.0000 0.0800 -0.0150 0.0000 0.0350" face="0 1 6 0 6 5 1 2 7 1 7 6 2 3 8 2 8 7 3 4 9 3 9 8 4 0 5 4 5 9 0 2 1 0 3 2 0 4 3 5 6 7 5 7 8 5 8 9"/>
   </asset>
   <worldbody>
     <body name="base_link">
@@ -91,24 +92,26 @@
                         <body name="left_tool" pos="0 0 0.05" quat="0.000563312 0.707388 -0.000562864 0.706825">
                           <site name="left_tool_site" pos="0 0 0"/>
                         </body>
-        <!-- Real CCS-696 opens HORIZONTALLY: at the home pose flange Y maps to
-             world -Y (lateral), so the jaws slide along flange Y. Fingers
-             extend along flange +Z (tool axis); flange->fingertip = 0.10 m
-             (measured on the real robot 2026-09-08). Real gripper identified
-             as the DM_Gripper (DM4310-2EC, Seeed SKU 100094243); CAD staged
-             in sim/assets/gripper_cad/ for a future high-fidelity import. -->
-        <body name="gripper_base_L" pos="0 0 0.01">
-          <inertial pos="0 0 0.05" mass="0.3" diaginertia="0.0002 0.0002 0.0002"/>
-          <geom type="box" size="0.022 0.03 0.015" pos="0 0 0.015" class="grip_col" rgba="0.25 0.25 0.28 1"/>
-          <body name="finger_a_L" pos="0 0.02 0.02">
-            <inertial pos="0 0 0.04" mass="0.05" diaginertia="1e-5 1e-5 1e-5"/>
+        <!-- KLM OmniGripper: flange->pivot 0.08 m is a CYLINDER of the flange
+             cross-section (dia ~0.078 from the Link7 mesh, per user 2026-09-10),
+             then the housing 0.14 m (flange Y, opening axis); claw tips at
+             flange+0.18. Webcam lump is a cosmetic placeholder. -->
+        <body name="gripper_base_L" pos="0 0 0.005">
+          <inertial pos="0 0 0.05" mass="0.5" diaginertia="0.001 0.0003 0.001"/>
+          <geom type="cylinder" size="0.039 0.0375" pos="0 0 0.0425" class="grip_col" rgba="0.15 0.15 0.16 1"/>
+          <geom type="box" size="0.033 0.07 0.02" pos="0 0 0.09" class="grip_col" rgba="0.06 0.06 0.07 1"/>
+          <geom type="box" size="0.008 0.02 0.015" pos="-0.039 0 0.09" contype="0" conaffinity="0" rgba="0.06 0.06 0.07 1"/>
+          <body name="claw_a_L" pos="0 0 0.095">
             <joint name="gripper_a_L" type="slide" axis="0 -1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <geom type="box" size="0.02 0.006 0.04" pos="0 0 0.04" class="grip_col" rgba="0.35 0.35 0.38 1"/>
+            <inertial pos="0 -0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
+            <geom type="box" size="0.015 0.0125 0.0125" pos="0 -0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
+            <geom type="mesh" mesh="claw_plate" class="grip_col" rgba="0.72 0.73 0.76 1"/>
           </body>
-          <body name="finger_b_L" pos="0 -0.02 0.02">
-            <inertial pos="0 0 0.04" mass="0.05" diaginertia="1e-5 1e-5 1e-5"/>
+          <body name="claw_b_L" pos="0 0 0.095">
             <joint name="gripper_b_L" type="slide" axis="0 1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <geom type="box" size="0.02 0.006 0.04" pos="0 0 0.04" class="grip_col" rgba="0.35 0.35 0.38 1"/>
+            <inertial pos="0 0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
+            <geom type="box" size="0.015 0.0125 0.0125" pos="0 0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
+            <geom type="mesh" mesh="claw_plate" quat="0 0 0 1" class="grip_col" rgba="0.72 0.73 0.76 1"/>
           </body>
         </body>
                       </body>
@@ -163,24 +166,26 @@
                         <body name="right_tool" pos="0 0 0.05" quat="0.000563312 -0.707388 -0.000562864 -0.706825">
                           <site name="right_tool_site" pos="0 0 0"/>
                         </body>
-        <!-- Real CCS-696 opens HORIZONTALLY: at the home pose flange Y maps to
-             world -Y (lateral), so the jaws slide along flange Y. Fingers
-             extend along flange +Z (tool axis); flange->fingertip = 0.10 m
-             (measured on the real robot 2026-09-08). Real gripper identified
-             as the DM_Gripper (DM4310-2EC, Seeed SKU 100094243); CAD staged
-             in sim/assets/gripper_cad/ for a future high-fidelity import. -->
-        <body name="gripper_base_R" pos="0 0 0.01">
-          <inertial pos="0 0 0.05" mass="0.3" diaginertia="0.0002 0.0002 0.0002"/>
-          <geom type="box" size="0.022 0.03 0.015" pos="0 0 0.015" class="grip_col" rgba="0.25 0.25 0.28 1"/>
-          <body name="finger_a_R" pos="0 0.02 0.02">
-            <inertial pos="0 0 0.04" mass="0.05" diaginertia="1e-5 1e-5 1e-5"/>
+        <!-- KLM OmniGripper: flange->pivot 0.08 m is a CYLINDER of the flange
+             cross-section (dia ~0.078 from the Link7 mesh, per user 2026-09-10),
+             then the housing 0.14 m (flange Y, opening axis); claw tips at
+             flange+0.18. Webcam lump is a cosmetic placeholder. -->
+        <body name="gripper_base_R" pos="0 0 0.005">
+          <inertial pos="0 0 0.05" mass="0.5" diaginertia="0.001 0.0003 0.001"/>
+          <geom type="cylinder" size="0.039 0.0375" pos="0 0 0.0425" class="grip_col" rgba="0.15 0.15 0.16 1"/>
+          <geom type="box" size="0.033 0.07 0.02" pos="0 0 0.09" class="grip_col" rgba="0.06 0.06 0.07 1"/>
+          <geom type="box" size="0.008 0.02 0.015" pos="-0.039 0 0.09" contype="0" conaffinity="0" rgba="0.06 0.06 0.07 1"/>
+          <body name="claw_a_R" pos="0 0 0.095">
             <joint name="gripper_a_R" type="slide" axis="0 -1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <geom type="box" size="0.02 0.006 0.04" pos="0 0 0.04" class="grip_col" rgba="0.35 0.35 0.38 1"/>
+            <inertial pos="0 -0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
+            <geom type="box" size="0.015 0.0125 0.0125" pos="0 -0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
+            <geom type="mesh" mesh="claw_plate" class="grip_col" rgba="0.72 0.73 0.76 1"/>
           </body>
-          <body name="finger_b_R" pos="0 -0.02 0.02">
-            <inertial pos="0 0 0.04" mass="0.05" diaginertia="1e-5 1e-5 1e-5"/>
+          <body name="claw_b_R" pos="0 0 0.095">
             <joint name="gripper_b_R" type="slide" axis="0 1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <geom type="box" size="0.02 0.006 0.04" pos="0 0 0.04" class="grip_col" rgba="0.35 0.35 0.38 1"/>
+            <inertial pos="0 0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
+            <geom type="box" size="0.015 0.0125 0.0125" pos="0 0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
+            <geom type="mesh" mesh="claw_plate" quat="0 0 0 1" class="grip_col" rgba="0.72 0.73 0.76 1"/>
           </body>
         </body> 
                       </body>
@@ -215,8 +220,4 @@
     <position joint="gripper_a_R" name="gripper_a_R_act" kp="40" forcerange="-20.0 20.0" ctrlrange="0 0.04"/>
     <position joint="gripper_b_R" name="gripper_b_R_act" kp="40" forcerange="-20.0 20.0" ctrlrange="0 0.04"/>
   </actuator>
-
-    <keyframe>
-    <key name="home" qpos="1.7 -1.1 -1.1 -2 -0.37 0.13 0.55 0.03 0.03 -1.7 -1.1 1.1 -2 0.37 0.13 -0.55 0.03 0.03"/>
-  </keyframe>
 </mujoco>
