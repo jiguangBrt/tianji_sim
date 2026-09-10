@@ -5,3 +5,6 @@ renders/
 libero_videos/
 # Heavy third-party gripper CAD (re-fetch: github.com/YlsonDdb/DM_Gripper, cad_resources/)
 assets/gripper_cad/
+# Full official Tianji URDF package (46 MB; the vendored subset used by the
+# build lives in robot_description/official_urdf/)
+Pro-m6-696/

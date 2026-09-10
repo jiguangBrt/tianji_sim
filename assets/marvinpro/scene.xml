@@ -4,6 +4,13 @@
     <rgba haze="0.15 0.25 0.35 1"/>
     <global azimuth="160" elevation="-20" offwidth="1280" offheight="960"/>
   </visual>
+  <default>
+    <!-- Cone side-wall compliance ~9e3 N/m measured from gripper feedback in
+         the teleop data (see the constants block). -->
+    <default class="cone_col">
+      <geom solref="0.01 1" friction="1.0 0.02 0.0005" group="3" condim="6"/>
+    </default>
+  </default>
   <asset>
     <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
     <texture name="groundplane" type="2d" builtin="checker" rgb1="0.2 0.3 0.4" rgb2="0.1 0.15 0.2"
@@ -15,42 +22,83 @@
   </asset>
   <worldbody>
     <light pos="0 0 3.5" dir="0 0 -1" directional="true"/>
-    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+    <geom name="floor" size="0 0 0.05" type="plane" pos="0 0 -0.082" material="groundplane"/>
     <!-- Work table in front of the robot (+X forward); dimensions measured
-         2026-09-09, see the constants block in build_scene.py. -->
-    <body name="table" pos="0.595 0 0.35">
-      <geom type="box" size="0.375 1.0 0.02" pos="0 0 0.36" rgba="0.165 0.471 0.376 1"/>
-      <geom type="box" size="0.03 0.03 0.36" pos="-0.32 -0.9299999999999999 0"/>
-      <geom type="box" size="0.03 0.03 0.36" pos="-0.32 0.9299999999999999 0"/>
-      <geom type="box" size="0.03 0.03 0.36" pos="0.32 -0.9299999999999999 0"/>
-      <geom type="box" size="0.03 0.03 0.36" pos="0.32 0.9299999999999999 0"/>
+         2026-09-09/10, see the constants block in build_scene.py. -->
+    <body name="table" pos="0.595 0 0.7180000000000001">
+      <geom type="box" size="0.375 1.0 0.02" pos="0 0 -0.02" rgba="0.165 0.471 0.376 1"/>
+      <geom type="box" size="0.03 0.03 0.38" pos="-0.32 -0.9299999999999999 -0.42"/>
+      <geom type="box" size="0.03 0.03 0.38" pos="-0.32 0.9299999999999999 -0.42"/>
+      <geom type="box" size="0.03 0.03 0.38" pos="0.32 -0.9299999999999999 -0.42"/>
+      <geom type="box" size="0.03 0.03 0.38" pos="0.32 0.9299999999999999 -0.42"/>
     </body>
     <!-- White tape target frame on the table (stacking zone); visual-only so it
          never disturbs cone contacts. -->
-    <body name="target_frame" pos="0.50 0 0.731">
+    <body name="target_frame" pos="0.50 0 0.7190000000000001">
       <geom type="box" size="0.065 0.01 0.0005" pos="0 0.055 0" contype="0" conaffinity="0" rgba="0.9 0.9 0.9 1"/>
       <geom type="box" size="0.065 0.01 0.0005" pos="0 -0.055 0" contype="0" conaffinity="0" rgba="0.9 0.9 0.9 1"/>
       <geom type="box" size="0.01 0.045 0.0005" pos="0.055 0 0" contype="0" conaffinity="0" rgba="0.9 0.9 0.9 1"/>
       <geom type="box" size="0.01 0.045 0.0005" pos="-0.055 0 0" contype="0" conaffinity="0" rgba="0.9 0.9 0.9 1"/>
     </body>
-    <!-- The two cones to stack (free bodies). -->
-    <body name="cone_1" pos="0.45 0.15 0.731">
+    <!-- The two cones to stack (free bodies). Hollow thin-walled shell
+         (12 wall boxes + top cap) so they nest; solid mesh is visual-only. -->
+    <body name="cone_1" pos="0.45 0.15 0.7190000000000001">
       <freejoint/>
-      <inertial pos="0 0 0.03" mass="0.04" diaginertia="2e-5 2e-5 8e-6"/>
-      <geom type="mesh" mesh="red_cone" rgba="0.682 0.008 0.169 1"/>
+      <inertial pos="0 0 0.04" mass="0.04" diaginertia="3.4e-5 3.4e-5 2.5e-5"/>
+      <geom type="mesh" mesh="red_cone" contype="0" conaffinity="0" rgba="0.682 0.008 0.169 1"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.02500 0.00000 0.04000" quat="0.699014 -0.106677 -0.106677 0.699014" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.02165 0.01250 0.04000" quat="0.494277 -0.075432 -0.130652 0.856113" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.01250 0.02165 0.04000" quat="0.255857 -0.039047 -0.145724 0.954870" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.00000 0.02500 0.04000" quat="0.000000 -0.000000 -0.150864 0.988554" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.01250 0.02165 0.04000" quat="-0.255857 0.039047 -0.145724 0.954870" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.02165 0.01250 0.04000" quat="-0.494277 0.075432 -0.130652 0.856113" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.02500 0.00000 0.04000" quat="0.699014 -0.106677 0.106677 -0.699014" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.02165 -0.01250 0.04000" quat="0.856113 -0.130652 0.075432 -0.494277" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.01250 -0.02165 0.04000" quat="0.954870 -0.145724 0.039047 -0.255857" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.00000 -0.02500 0.04000" quat="0.988554 -0.150864 0.000000 -0.000000" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.01250 -0.02165 0.04000" quat="0.954870 -0.145724 -0.039047 0.255857" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.02165 -0.01250 0.04000" quat="0.856113 -0.130652 -0.075432 0.494277" class="cone_col"/>
+      <geom type="cylinder" size="0.0125 0.0015" pos="0 0 0.0785" class="cone_col"/>
     </body>
-    <body name="cone_2" pos="0.58 -0.13 0.731">
+    <body name="cone_2" pos="0.58 -0.13 0.7190000000000001">
       <freejoint/>
-      <inertial pos="0 0 0.03" mass="0.04" diaginertia="2e-5 2e-5 8e-6"/>
-      <geom type="mesh" mesh="red_cone" rgba="0.682 0.008 0.169 1"/>
+      <inertial pos="0 0 0.04" mass="0.04" diaginertia="3.4e-5 3.4e-5 2.5e-5"/>
+      <geom type="mesh" mesh="red_cone" contype="0" conaffinity="0" rgba="0.682 0.008 0.169 1"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.02500 0.00000 0.04000" quat="0.699014 -0.106677 -0.106677 0.699014" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.02165 0.01250 0.04000" quat="0.494277 -0.075432 -0.130652 0.856113" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.01250 0.02165 0.04000" quat="0.255857 -0.039047 -0.145724 0.954870" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.00000 0.02500 0.04000" quat="0.000000 -0.000000 -0.150864 0.988554" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.01250 0.02165 0.04000" quat="-0.255857 0.039047 -0.145724 0.954870" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.02165 0.01250 0.04000" quat="-0.494277 0.075432 -0.130652 0.856113" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.02500 0.00000 0.04000" quat="0.699014 -0.106677 0.106677 -0.699014" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.02165 -0.01250 0.04000" quat="0.856113 -0.130652 0.075432 -0.494277" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.01250 -0.02165 0.04000" quat="0.954870 -0.145724 0.039047 -0.255857" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="-0.00000 -0.02500 0.04000" quat="0.988554 -0.150864 0.000000 -0.000000" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.01250 -0.02165 0.04000" quat="0.954870 -0.145724 -0.039047 0.255857" class="cone_col"/>
+      <geom type="box" size="0.00737 0.004 0.04191" pos="0.02165 -0.01250 0.04000" quat="0.856113 -0.130652 -0.075432 0.494277" class="cone_col"/>
+      <geom type="cylinder" size="0.0125 0.0015" pos="0 0 0.0785" class="cone_col"/>
     </body>
   </worldbody>
+  <!-- Grasp assist (runtime-toggled). Rigid + soft contacts reproduce the
+       grasp STATE (jaw gap matches teleop feedback) but not retention through
+       arm motion: the real cone's pocket-locking deformation is missing, so a
+       physically-gripped cone migrates along the smooth plates and escapes.
+       The rollout loop should activate the weld for the grasped (cone, arm)
+       pair: write the current relative pose into eq_data[3:11] (pos of the
+       carrier in the cone frame, then wxyz quat) and set data.eq_active=1;
+       clear on gripper-open command. -->
+  <equality>
+    <weld name="weld_cone_1_L" body1="cone_1" body2="grip_carrier_L" active="false"/>
+    <weld name="weld_cone_1_R" body1="cone_1" body2="grip_carrier_R" active="false"/>
+    <weld name="weld_cone_2_L" body1="cone_2" body2="grip_carrier_L" active="false"/>
+    <weld name="weld_cone_2_R" body1="cone_2" body2="grip_carrier_R" active="false"/>
+  </equality>
   <include file="marvin_pro_dual_gripper.xml"/>
   <!-- Complete home keyframe for the assembled scene (moved out of the robot
        model: MuJoCo zero-pads short keyframes, which gave the cone free joints
        invalid zero quaternions). Order follows joint document order:
        cone_1 (x y z qw qx qy qz), cone_2, then the 18 robot joints. -->
   <keyframe>
-    <key name="home" qpos="0.45 0.15 0.731 1 0 0 0 0.58 -0.13 0.731 1 0 0 0 1.7 -1.1 -1.1 -2 -0.37 0.13 0.55 0.04 0.04 -1.7 -1.1 1.1 -2 0.37 0.13 -0.55 0.04 0.04"/>
+    <key name="home" qpos="0.45 0.15 0.7190000000000001 1 0 0 0 0.58 -0.13 0.7190000000000001 1 0 0 0 1.7 -1.1 -1.1 -2 -0.37 0.13 0.55 0.0 0.0 -1.7 -1.1 1.1 -2 0.37 0.13 -0.55 0.0 0.0"/>
   </keyframe>
 </mujoco>

@@ -41,7 +41,11 @@
     <mesh name="Link6_R" content_type="model/stl" file="meshes/link6_r.stl"/>
     <mesh name="Link7_R" content_type="model/stl" file="meshes/link7_r.stl"/>
     <mesh name="ZJ_Robot_link" content_type="model/stl" file="meshes/zj_robot_link.stl"/>
-    <mesh name="claw_plate" vertex="-0.0150 -0.0040 0.0100 0.0150 -0.0040 0.0100 0.0150 -0.0040 0.0350 0.0000 -0.0040 0.0800 -0.0150 -0.0040 0.0350 -0.0150 0.0000 0.0100 0.0150 0.0000 0.0100 0.0150 0.0000 0.0350 0.0000 0.0000 0.0800 -0.0150 0.0000 0.0350" face="0 1 6 0 6 5 1 2 7 1 7 6 2 3 8 2 8 7 3 4 9 3 9 8 4 0 5 4 5 9 0 2 1 0 3 2 0 4 3 5 6 7 5 7 8 5 8 9"/>
+    <mesh name="grip_base" content_type="model/stl" file="meshes/gripper/base.stl"/>
+    <mesh name="grip_carrier" content_type="model/stl" file="meshes/gripper/carrier.stl"/>
+    <mesh name="grip_finger_a" content_type="model/stl" file="meshes/gripper/finger_a.stl"/>
+    <mesh name="grip_finger_b" content_type="model/stl" file="meshes/gripper/finger_b.stl"/>
+    <mesh name="grip_wrist_cam" content_type="model/stl" file="meshes/gripper/wrist_cam.stl"/>
   </asset>
   <worldbody>
     <body name="base_link">
@@ -92,26 +96,33 @@
                         <body name="left_tool" pos="0 0 0.05" quat="0.000563312 0.707388 -0.000562864 0.706825">
                           <site name="left_tool_site" pos="0 0 0"/>
                         </body>
-        <!-- KLM OmniGripper: flange->pivot 0.08 m is a CYLINDER of the flange
-             cross-section (dia ~0.078 from the Link7 mesh, per user 2026-09-10),
-             then the housing 0.14 m (flange Y, opening axis); claw tips at
-             flange+0.18. Webcam lump is a cosmetic placeholder. -->
-        <body name="gripper_base_L" pos="0 0 0.005">
-          <inertial pos="0 0 0.05" mass="0.5" diaginertia="0.001 0.0003 0.001"/>
-          <geom type="cylinder" size="0.039 0.0375" pos="0 0 0.0425" class="grip_col" rgba="0.15 0.15 0.16 1"/>
-          <geom type="box" size="0.033 0.07 0.02" pos="0 0 0.09" class="grip_col" rgba="0.06 0.06 0.07 1"/>
-          <geom type="box" size="0.008 0.02 0.015" pos="-0.039 0 0.09" contype="0" conaffinity="0" rgba="0.06 0.06 0.07 1"/>
-          <body name="claw_a_L" pos="0 0 0.095">
-            <joint name="gripper_a_L" type="slide" axis="0 -1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <inertial pos="0 -0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
-            <geom type="box" size="0.015 0.0125 0.0125" pos="0 -0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
-            <geom type="mesh" mesh="claw_plate" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+        <body name="gripper_base_L" pos="0 0 0.007">
+          <inertial pos="0.0335 0.0008 0.0162" mass="0.45" diaginertia="0.00034 0.00067 0.00072"/>
+          <geom type="mesh" mesh="grip_base" class="grip_col" rgba="0.12 0.12 0.13 1"/>
+          <body name="wrist_cam_L" pos="0.06 0 0.064822" quat="0.549549 -0.549438 -0.445050 0.445022">
+            <inertial pos="0.0002 0.0265 0.0015" mass="0.08" diaginertia="2e-5 2e-5 2e-5"/>
+            <geom type="mesh" mesh="grip_wrist_cam" class="grip_col" rgba="0.06 0.06 0.07 1"/>
           </body>
-          <body name="claw_b_L" pos="0 0 0.095">
-            <joint name="gripper_b_L" type="slide" axis="0 1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <inertial pos="0 0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
-            <geom type="box" size="0.015 0.0125 0.0125" pos="0 0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
-            <geom type="mesh" mesh="claw_plate" quat="0 0 0 1" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+          <body name="grip_carrier_L" pos="0 0 -0.031" quat="0 0 0.707107 -0.707107">
+            <inertial pos="-0.0009 -0.0896 0.0003" mass="0.20" diaginertia="0.00047 0.00049 0.00021"/>
+            <geom type="mesh" mesh="grip_carrier" contype="0" conaffinity="0" rgba="0.12 0.12 0.13 1"/>
+            <!-- Collision: only the two slider blocks at the opening-axis
+                 extremes (sized from the carrier mesh occupancy map); the
+                 middle channel stays open so a gripped cone's top can enter
+                 between the plates (the convex hull of the full carrier mesh
+                 filled that channel and blocked lifts). -->
+            <geom type="box" size="0.022 0.0335 0.0175" pos="0 -0.0815 0.0525" class="grip_col" rgba="0.12 0.12 0.13 1"/>
+            <geom type="box" size="0.022 0.0335 0.0175" pos="0 -0.0815 -0.0525" class="grip_col" rgba="0.12 0.12 0.13 1"/>
+            <body name="grip_finger_a_L" pos="0 0 0">
+              <joint name="gripper_a_L" type="slide" axis="0 0 -1" range="0 0.04" damping="192.0" armature="0.05"/>
+              <inertial pos="-0.0005 -0.1427 0.0575" mass="0.03" diaginertia="2.5e-5 5e-6 2.5e-5"/>
+              <geom type="mesh" mesh="grip_finger_a" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+            </body>
+            <body name="grip_finger_b_L" pos="0 0 0">
+              <joint name="gripper_b_L" type="slide" axis="0 0 1" range="0 0.04" damping="192.0" armature="0.05"/>
+              <inertial pos="0.0005 -0.1427 -0.0576" mass="0.03" diaginertia="2.5e-5 5e-6 2.5e-5"/>
+              <geom type="mesh" mesh="grip_finger_b" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+            </body>
           </body>
         </body>
                       </body>
@@ -166,26 +177,33 @@
                         <body name="right_tool" pos="0 0 0.05" quat="0.000563312 -0.707388 -0.000562864 -0.706825">
                           <site name="right_tool_site" pos="0 0 0"/>
                         </body>
-        <!-- KLM OmniGripper: flange->pivot 0.08 m is a CYLINDER of the flange
-             cross-section (dia ~0.078 from the Link7 mesh, per user 2026-09-10),
-             then the housing 0.14 m (flange Y, opening axis); claw tips at
-             flange+0.18. Webcam lump is a cosmetic placeholder. -->
-        <body name="gripper_base_R" pos="0 0 0.005">
-          <inertial pos="0 0 0.05" mass="0.5" diaginertia="0.001 0.0003 0.001"/>
-          <geom type="cylinder" size="0.039 0.0375" pos="0 0 0.0425" class="grip_col" rgba="0.15 0.15 0.16 1"/>
-          <geom type="box" size="0.033 0.07 0.02" pos="0 0 0.09" class="grip_col" rgba="0.06 0.06 0.07 1"/>
-          <geom type="box" size="0.008 0.02 0.015" pos="-0.039 0 0.09" contype="0" conaffinity="0" rgba="0.06 0.06 0.07 1"/>
-          <body name="claw_a_R" pos="0 0 0.095">
-            <joint name="gripper_a_R" type="slide" axis="0 -1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <inertial pos="0 -0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
-            <geom type="box" size="0.015 0.0125 0.0125" pos="0 -0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
-            <geom type="mesh" mesh="claw_plate" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+        <body name="gripper_base_R" pos="0 0 0.007">
+          <inertial pos="0.0335 0.0008 0.0162" mass="0.45" diaginertia="0.00034 0.00067 0.00072"/>
+          <geom type="mesh" mesh="grip_base" class="grip_col" rgba="0.12 0.12 0.13 1"/>
+          <body name="wrist_cam_R" pos="0.06 0 0.064822" quat="0.549549 -0.549438 -0.445050 0.445022">
+            <inertial pos="0.0002 0.0265 0.0015" mass="0.08" diaginertia="2e-5 2e-5 2e-5"/>
+            <geom type="mesh" mesh="grip_wrist_cam" class="grip_col" rgba="0.06 0.06 0.07 1"/>
           </body>
-          <body name="claw_b_R" pos="0 0 0.095">
-            <joint name="gripper_b_R" type="slide" axis="0 1 0" range="0 0.04" damping="1" armature="0.001"/>
-            <inertial pos="0 0.012 0.04" mass="0.08" diaginertia="3e-5 3e-5 1e-5"/>
-            <geom type="box" size="0.015 0.0125 0.0125" pos="0 0.0125 0.0125" class="grip_col" rgba="0.06 0.06 0.07 1"/>
-            <geom type="mesh" mesh="claw_plate" quat="0 0 0 1" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+          <body name="grip_carrier_R" pos="0 0 -0.031" quat="0 0 0.707107 -0.707107">
+            <inertial pos="-0.0009 -0.0896 0.0003" mass="0.20" diaginertia="0.00047 0.00049 0.00021"/>
+            <geom type="mesh" mesh="grip_carrier" contype="0" conaffinity="0" rgba="0.12 0.12 0.13 1"/>
+            <!-- Collision: only the two slider blocks at the opening-axis
+                 extremes (sized from the carrier mesh occupancy map); the
+                 middle channel stays open so a gripped cone's top can enter
+                 between the plates (the convex hull of the full carrier mesh
+                 filled that channel and blocked lifts). -->
+            <geom type="box" size="0.022 0.0335 0.0175" pos="0 -0.0815 0.0525" class="grip_col" rgba="0.12 0.12 0.13 1"/>
+            <geom type="box" size="0.022 0.0335 0.0175" pos="0 -0.0815 -0.0525" class="grip_col" rgba="0.12 0.12 0.13 1"/>
+            <body name="grip_finger_a_R" pos="0 0 0">
+              <joint name="gripper_a_R" type="slide" axis="0 0 -1" range="0 0.04" damping="192.0" armature="0.05"/>
+              <inertial pos="-0.0005 -0.1427 0.0575" mass="0.03" diaginertia="2.5e-5 5e-6 2.5e-5"/>
+              <geom type="mesh" mesh="grip_finger_a" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+            </body>
+            <body name="grip_finger_b_R" pos="0 0 0">
+              <joint name="gripper_b_R" type="slide" axis="0 0 1" range="0 0.04" damping="192.0" armature="0.05"/>
+              <inertial pos="0.0005 -0.1427 -0.0576" mass="0.03" diaginertia="2.5e-5 5e-6 2.5e-5"/>
+              <geom type="mesh" mesh="grip_finger_b" class="grip_col" rgba="0.72 0.73 0.76 1"/>
+            </body>
           </body>
         </body> 
                       </body>
@@ -215,9 +233,9 @@
     <general class="ccs_m6" joint="Joint5_R" name="Joint5_R_act"/>
     <general class="ccs_m6" joint="Joint6_R" name="Joint6_R_act"/>
     <general class="ccs_m6" joint="Joint7_R" name="Joint7_R_act"/>
-    <position joint="gripper_a_L" name="gripper_a_L_act" kp="40" forcerange="-20.0 20.0" ctrlrange="0 0.04"/>
-    <position joint="gripper_b_L" name="gripper_b_L_act" kp="40" forcerange="-20.0 20.0" ctrlrange="0 0.04"/>
-    <position joint="gripper_a_R" name="gripper_a_R_act" kp="40" forcerange="-20.0 20.0" ctrlrange="0 0.04"/>
-    <position joint="gripper_b_R" name="gripper_b_R_act" kp="40" forcerange="-20.0 20.0" ctrlrange="0 0.04"/>
+    <position joint="gripper_a_L" name="gripper_a_L_act" kp="4800.0" forcerange="-150.0 150.0" ctrlrange="0 0.04"/>
+    <position joint="gripper_b_L" name="gripper_b_L_act" kp="4800.0" forcerange="-150.0 150.0" ctrlrange="0 0.04"/>
+    <position joint="gripper_a_R" name="gripper_a_R_act" kp="4800.0" forcerange="-150.0 150.0" ctrlrange="0 0.04"/>
+    <position joint="gripper_b_R" name="gripper_b_R_act" kp="4800.0" forcerange="-150.0 150.0" ctrlrange="0 0.04"/>
   </actuator>
 </mujoco>
